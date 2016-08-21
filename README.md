@@ -27,3 +27,14 @@ def application(env, sr):
     return "OK"
 ```
 
+```
+import requests
+
+params = {
+    "msg": "hello,world"          
+}
+
+files = {'mfy': open('/root/jp.png', 'rb')}
+
+requests.post("http://127.0.0.1", data=params, files=files)
+```
