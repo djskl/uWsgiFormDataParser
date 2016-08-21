@@ -5,11 +5,9 @@ Classes representing uploaded files.
 import errno
 import os
 from io import BytesIO
-
-from django.conf import settings
-from django.core.files import temp as tempfile
-from django.core.files.base import File
-from django.utils.encoding import force_str
+import temp as tempfile
+from files.basefile import File
+from utils import force_bytes, FILE_UPLOAD_TEMP_DIR
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
            'SimpleUploadedFile')
@@ -33,7 +31,7 @@ class UploadedFile(File):
         self.content_type_extra = content_type_extra
 
     def __repr__(self):
-        return force_str("<%s: %s (%s)>" % (
+        return force_bytes("<%s: %s (%s)>" % (
             self.__class__.__name__, self.name, self.content_type))
 
     def _get_name(self):
@@ -61,9 +59,9 @@ class TemporaryUploadedFile(UploadedFile):
     A file uploaded to a temporary location (i.e. stream-to-disk).
     """
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
-        if settings.FILE_UPLOAD_TEMP_DIR:
+        if FILE_UPLOAD_TEMP_DIR:
             file = tempfile.NamedTemporaryFile(suffix='.upload',
-                dir=settings.FILE_UPLOAD_TEMP_DIR)
+                dir = FILE_UPLOAD_TEMP_DIR)
         else:
             file = tempfile.NamedTemporaryFile(suffix='.upload')
         super(TemporaryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)

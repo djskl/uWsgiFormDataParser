@@ -15,6 +15,7 @@ FILE = "file"
 FIELD = "field"
 DEFAULT_CHARSET = 'utf-8'
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
+FILE_UPLOAD_TEMP_DIR = "/tmp"
 
 _PROTECTED_TYPES = (type(None), int, long, float, Decimal,
     datetime.datetime, datetime.date, datetime.time)
@@ -237,6 +238,18 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
                          for arg in s)
     return s
 
+def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+    """
+    Returns a text object representing 's' -- unicode on Python 2 and str on
+    Python 3. Treats bytestrings using the 'encoding' codec.
+
+    If strings_only is True, don't convert (some) non-string-like objects.
+    """
+    if isinstance(s, Promise):
+        # The input is the result of a gettext_lazy() call.
+        return s
+    return force_text(s, encoding, strings_only, errors)
+
 def _replace_entity(match):
     text = match.group(1)
     if text[0] == '#':
@@ -438,4 +451,24 @@ def import_string(dotted_path):
         msg = 'Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
         raise ImportError, ImportError(msg), sys.exc_info()[2]
+
+def endswith_cr(line):
+    """
+    Return True if line (a text or byte string) ends with '\r'.
+    """
+    return line.endswith('\r' if isinstance(line, unicode) else b'\r')
+
+
+def endswith_lf(line):
+    """
+    Return True if line (a text or byte string) ends with '\n'.
+    """
+    return line.endswith('\n' if isinstance(line, unicode) else b'\n')
+
+
+def equals_lf(line):
+    """
+    Return True if line (a text or byte string) equals '\n'.
+    """
+    return line == ('\n' if isinstance(line, unicode) else b'\n')
 
