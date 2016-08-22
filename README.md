@@ -1,6 +1,9 @@
 代码直接取自Django，删除了其中对Django其他包和模块的依赖，并对部分代码添加了注释。
+
+例子：
 ```
-#wsgi.py
+#wsgi.py，定义uwsgi application
+
 from multipartparser import MultiPartParser
 from datastructures import ImmutableList
 from files.uploadhandler import MemoryFileUploadHandler,\
@@ -26,6 +29,11 @@ def application(env, sr):
 ```
 
 ```
+uwsgi --module wsgi --http :80  #启动uwsgi服务器
+```
+
+```
+#借助requests测试表单数据提交
 import requests
 
 params = {
